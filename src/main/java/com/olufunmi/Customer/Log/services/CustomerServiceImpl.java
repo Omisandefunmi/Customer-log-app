@@ -2,6 +2,7 @@ package com.olufunmi.Customer.Log.services;
 
 import com.olufunmi.Customer.Log.data.models.BillingDetails;
 import com.olufunmi.Customer.Log.data.models.Customer;
+import com.olufunmi.Customer.Log.data.repositories.BillingDetailsRepository;
 import com.olufunmi.Customer.Log.data.repositories.CustomerRepository;
 import com.olufunmi.Customer.Log.dtos.requests.AddCustomerRequest;
 
@@ -22,6 +23,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class CustomerServiceImpl implements CustomerService{
     private final CustomerRepository customerRepository;
+    private final BillingDetailsRepository billingDetailsRepository;
 
     @Override
     public AddCustomerResponse addCustomer(AddCustomerRequest request) throws EmailAlreadyExistException {
@@ -40,7 +42,10 @@ public class CustomerServiceImpl implements CustomerService{
                 .billingDetails(billingDetails)
                 .build();
 
+
         customerRepository.save(customer);
+        billingDetailsRepository.save(billingDetails);
+
 
         return AddCustomerResponse.builder()
                 .email(customer.getEmail())
@@ -69,7 +74,10 @@ public class CustomerServiceImpl implements CustomerService{
     }
 
     private BillingDetails createBillingDetails(String accountNumber, String tariff){
-        return new BillingDetails(accountNumber, tariff);
+        return  BillingDetails.builder()
+                .accountNumber(accountNumber)
+                .tariff(tariff)
+                .build();
     }
 
     private String generateAccountNumber(){
