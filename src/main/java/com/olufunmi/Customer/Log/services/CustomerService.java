@@ -9,6 +9,7 @@ import com.olufunmi.Customer.Log.dtos.responses.RetrieveCustomerResponse;
 import com.olufunmi.Customer.Log.exceptions.EmailAlreadyExistException;
 import com.olufunmi.Customer.Log.exceptions.EmailNotFoundException;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public interface CustomerService {
@@ -16,5 +17,5 @@ public interface CustomerService {
 
     RetrieveCustomerResponse retrieveCustomer(String email) throws EmailNotFoundException;
 
-    List<RetrieveCustomerResponse> retrieveAll ();
+    ArrayList<RetrieveCustomerResponse> retrieveAll ();
 }

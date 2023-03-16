@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -74,9 +75,9 @@ public class CustomerServiceImpl implements CustomerService{
     }
 
     @Override
-    public List <RetrieveCustomerResponse> retrieveAll() {
+    public ArrayList<RetrieveCustomerResponse> retrieveAll() {
         List<Customer> customers = customerRepository.findAll();
-        return customers.stream().map(this::mapCustomerToResponse).toList();
+        return new ArrayList<>(customers.stream().map(this::mapCustomerToResponse).toList());
 
     }
 

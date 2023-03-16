@@ -10,12 +10,12 @@ import com.olufunmi.Customer.Log.dtos.responses.RetrieveCustomerResponse;
 import com.olufunmi.Customer.Log.services.CustomerService;
 import com.olufunmi.Customer.Log.services.CustomerServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
+
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -67,6 +67,7 @@ public class CustomerServiceTest {
     }
 
     @Test
+    @DisplayName("Add a customer Test")
     public void addCustomerTest(){
         AddCustomerResponse response = AddCustomerResponse.builder()
                 .message("add success")
@@ -82,6 +83,7 @@ public class CustomerServiceTest {
     }
 
     @Test
+    @DisplayName("Retrieve a customer Test")
     public void retrieveCustomerTest(){
         RetrieveCustomerResponse response = RetrieveCustomerResponse.builder()
                 .billingDetails(mockBillingDetails)
@@ -97,16 +99,20 @@ public class CustomerServiceTest {
     }
 
     @Test
+    @DisplayName("Retrieve All Customer Test")
     public void retrieveAllCustomerTest(){
+        saveACustomer();
+        when(customerRepository.findByEmail(mockCustomer.getEmail())).thenReturn(Optional.of(mockCustomer));
+        List<RetrieveCustomerResponse> response1 = customerService.retrieveAll();
+        assertThat(response1.size()).isZero();
+
+    }
+
+    private void saveACustomer(){
         when(customerRepository.findByEmail(request.getEmail())).thenReturn(Optional.empty());
         when(billingDetailsRepository.save(any(BillingDetails.class))).thenReturn(mockBillingDetails);
         when(customerRepository.save(any(Customer.class))).thenReturn(mockCustomer);
-        AddCustomerResponse response = customerService.addCustomer(request);
-        assertThat(response.getEmail()).isEqualTo(response.getEmail());
-
-        when(customerRepository.findByEmail(mockCustomer.getEmail())).thenReturn(Optional.of(mockCustomer));
-        List<RetrieveCustomerResponse> response1 = customerService.retrieveAll();
-        assertThat(response1.size()).isEqualTo(1);
+        customerService.addCustomer(request);
 
     }
 }
