@@ -12,6 +12,7 @@ import com.olufunmi.Customer.Log.dtos.responses.RetrieveCustomerResponse;
 import com.olufunmi.Customer.Log.exceptions.EmailAlreadyExistException;
 import com.olufunmi.Customer.Log.exceptions.EmailNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
@@ -20,6 +21,7 @@ import java.util.Optional;
 
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class CustomerServiceImpl implements CustomerService{
     private final CustomerRepository customerRepository;
@@ -33,6 +35,7 @@ public class CustomerServiceImpl implements CustomerService{
           throw new EmailAlreadyExistException("Email already exists");
       }
         String accountNumber = generateAccountNumber();
+      log.info("Account number is ===>>> "+accountNumber);
         BillingDetails billingDetails = createBillingDetails(accountNumber, request.getTariff());
 
         Customer customer = Customer.builder()
@@ -42,9 +45,10 @@ public class CustomerServiceImpl implements CustomerService{
                 .billingDetails(billingDetails)
                 .build();
 
+        billingDetailsRepository.save(billingDetails);
 
         customerRepository.save(customer);
-        billingDetailsRepository.save(billingDetails);
+
 
 
         return AddCustomerResponse.builder()
@@ -56,8 +60,11 @@ public class CustomerServiceImpl implements CustomerService{
 
     @Override
     public RetrieveCustomerResponse retrieveCustomer(String email) throws EmailNotFoundException {
-        Customer retrieved = customerRepository.findByEmail(email).orElseThrow(() -> new EmailNotFoundException("Email does not exist"));
-
+        Optional <Customer> found = customerRepository.findByEmail(email);
+        if(found.isEmpty()){
+            throw new EmailNotFoundException("Email does not exist");
+        }
+        Customer retrieved = found.get();
         return RetrieveCustomerResponse.builder()
                 .firstName(retrieved.getFirstName())
                 .lastName(retrieved.getLastName())
@@ -82,7 +89,11 @@ public class CustomerServiceImpl implements CustomerService{
 
     private String generateAccountNumber(){
         SecureRandom numbers = new SecureRandom();
-        return String.valueOf(numbers.nextInt(10)).concat("-01");
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < 10; i++) {
+            stringBuilder.append(numbers.nextInt(10));
+        }
+        return stringBuilder.append("-01").toString();
     }
 
     private RetrieveCustomerResponse mapCustomerToResponse(Customer customer){

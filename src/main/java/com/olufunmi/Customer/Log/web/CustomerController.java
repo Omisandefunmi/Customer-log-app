@@ -2,7 +2,9 @@ package com.olufunmi.Customer.Log.web;
 
 import com.olufunmi.Customer.Log.dtos.requests.AddCustomerRequest;
 
+import com.olufunmi.Customer.Log.dtos.responses.ApiResponse;
 import com.olufunmi.Customer.Log.services.CustomerService;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,31 +21,32 @@ import java.util.Map;
 public class CustomerController {
     private final CustomerService customerService;
 
-    @PostMapping("/add_customer")
+    @PostMapping(value = "/add_customer")
     public ResponseEntity <?> addCustomer(@RequestBody AddCustomerRequest request)  {
-        return new ResponseEntity<>(customerService.addCustomer(request), HttpStatus.CREATED);
+        return new ResponseEntity<>(ApiResponse.builder()
+                .isSuccessful(true)
+                .data(customerService.addCustomer(request))
+                .statusCode(201)
+                .build(), HttpStatus.CREATED);
     }
 
-    @GetMapping("/retrieve_customer/{email}")
-    public ResponseEntity <?> retrieveCustomer(@PathVariable String email) {
-        return new ResponseEntity<>(customerService.retrieveCustomer(email), HttpStatus.FOUND);
+    @GetMapping("/find")
+    public ResponseEntity <?> retrieveCustomer(@RequestParam String email) {
+        return new ResponseEntity<>(ApiResponse.builder()
+                .isSuccessful(true)
+                .data(customerService.retrieveCustomer(email))
+                .statusCode(200)
+                .build(), HttpStatus.OK);
     }
 
     @GetMapping("/retrieve_all")
     public ResponseEntity <?> retrieveAll(){
-        return new ResponseEntity<>(customerService.retrieveAll(), HttpStatus.FOUND);
+        return new ResponseEntity<>(ApiResponse.builder()
+                .isSuccessful(true)
+                .data(customerService.retrieveAll())
+                .statusCode(200)
+                .build(),  HttpStatus.OK);
     }
 
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public Map<String, String> handleValidationExceptions(MethodArgumentNotValidException exception) {
-        Map<String, String> errors = new HashMap<>();
-        exception.getBindingResult().getAllErrors().forEach((error -> {
-            String fieldName = ((FieldError) error).getField();
-            String errorMessage = error.getDefaultMessage();
-            errors.put(fieldName, errorMessage);
-        }));
-        return errors;
-    }
 
 }

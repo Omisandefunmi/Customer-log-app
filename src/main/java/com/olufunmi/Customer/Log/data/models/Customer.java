@@ -2,6 +2,7 @@ package com.olufunmi.Customer.Log.data.models;
 
 import lombok.*;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 
 import java.util.ArrayList;
 
@@ -17,6 +18,7 @@ public class Customer {
     private String lastName;
     @NonNull
     private String email;
+    @DBRef
     private BillingDetails billingDetails;
 
 }
